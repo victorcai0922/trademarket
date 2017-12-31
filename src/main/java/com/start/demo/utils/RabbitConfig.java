@@ -45,7 +45,7 @@ public class RabbitConfig {
         connectionFactory.setPort(this.port);
         connectionFactory.setUsername(this.username);
         connectionFactory.setPassword(this.password);
-        connectionFactory.setVirtualHost(this.virtualHost);
+        connectionFactory.setVirtualHost("/");
         connectionFactory.setPublisherConfirms(true);
         return connectionFactory;
     }
@@ -57,21 +57,46 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    /**
+     * 配置消息交换机
+     * 针对消费者配置
+     FanoutExchange: 将消息分发到所有的绑定队列，无routingkey的概念
+     HeadersExchange ：通过添加属性key-value匹配
+     DirectExchange:按照routingkey分发到指定队列
+     TopicExchange:多关键字匹配
+     */
+
     @Bean
     public DirectExchange defaultExchange(){
-        return new DirectExchange(EXCHANGE);
+        return new DirectExchange(EXCHANGE,true,false);
     }
 
+    /**
+     * 配置消息队列1
+     * 针对消费者配置
+     * @return
+     */
     @Bean
     public Queue queue(){
-        return new Queue("spring-boot-queue",true);
+        return new Queue("spring-boot-queue1",true);
     }
 
+    /**
+     * 将消息队列1与交换机绑定
+     * 针对消费者配置
+     * @return
+     */
     @Bean
     public Binding binding(){
         return BindingBuilder.bind(queue()).to(defaultExchange()).with(ROUTINGKEY);
     }
 
+
+    /**
+     * 接受消息的监听，这个监听会接受消息队列1的消息
+     * 针对消费者配置
+     * @return
+     */
     @Bean
     public SimpleMessageListenerContainer messageListenerContainer(){
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory());

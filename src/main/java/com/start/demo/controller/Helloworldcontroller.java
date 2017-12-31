@@ -3,6 +3,7 @@ package com.start.demo.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.start.demo.domain.MessageSender;
 import com.start.demo.service.IHttpService;
 import com.start.demo.service.IStockService;
 import com.start.demo.service.IUserService;
@@ -25,6 +26,9 @@ public class Helloworldcontroller {
 
     @Autowired
     private IHttpService httpService;
+
+    @Autowired
+    private MessageSender messageSender;
 
     @RequestMapping("/hello")
     public String index() {
@@ -82,5 +86,9 @@ public class Helloworldcontroller {
             }
 
 
+     @RequestMapping("/send")
+    public void sendMsgTomq(){
+         messageSender.sendMsg("hello");
+     }
 
 }

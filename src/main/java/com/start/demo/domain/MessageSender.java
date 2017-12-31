@@ -1,5 +1,6 @@
 package com.start.demo.domain;
 
+import com.start.demo.service.IHttpService;
 import com.start.demo.utils.RabbitConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.CorrelationData;
@@ -15,6 +16,9 @@ public class MessageSender implements RabbitTemplate.ConfirmCallback {
     private  RabbitTemplate rabbitTemplate;
 
     @Autowired
+    private IHttpService httpService;
+
+    @Autowired
     public MessageSender(RabbitTemplate rabbitTemplate){
         this.rabbitTemplate = rabbitTemplate;
         rabbitTemplate.setConfirmCallback(this);
@@ -22,6 +26,13 @@ public class MessageSender implements RabbitTemplate.ConfirmCallback {
 
     public void sendMsg(String content){
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
+        try {
+            content = httpService.doGet("https://api.wmcloud.com/data/v1//api/equity/getMktEqudCCXE.json?field=&secID=000001.XSHE&startDate=&endDate=");
+
+        }catch (Exception ex){
+
+        }
+
         rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE,RabbitConfig.ROUTINGKEY,content,correlationData);
     }
 
